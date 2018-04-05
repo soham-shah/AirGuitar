@@ -19,7 +19,7 @@ class GuitarString:
         """Returns next sample from string."""
         if self.current_sample >= self.starting_sample:
             current_sample_mod = self.current_sample % self.wavetable.size
-            r = np.random.binomial(1, 1 - 1/self.stretch_factor)
+            r = np.random.binomial(1, 1. - 1/self.stretch_factor)
             if r == 0:
                 self.wavetable[current_sample_mod] =  0.5 * (self.wavetable[current_sample_mod] + self.previous_value)
             sample = self.wavetable[current_sample_mod]

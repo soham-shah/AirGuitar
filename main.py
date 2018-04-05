@@ -2,11 +2,11 @@ import numpy as np
 import pyaudio
 from GuitarString import GuitarString
 import time
-
+import matplotlib.pyplot as plt
 # initialize the different guitar strings
 fs = 8000 #sampling rate of 8000 hz
 freqs = [100, 125, 150, 175, 200, 225, 250]
-stretch_factors = [2 * f/98 for f in freqs]
+stretch_factors = [2 * f/98. for f in freqs]
 strings = []
 for freq, stretch_factor in zip(freqs, stretch_factors):
     string = GuitarString(freq, 0, fs, stretch_factor)
@@ -15,25 +15,31 @@ for freq, stretch_factor in zip(freqs, stretch_factors):
 # guitar_sound = [sum(string.get_sample() for string in strings) for _ in range(fs * 6)]
 # x = np.array(guitar_sound)
 
-tunes = [string.get_pluck(40000) for string in strings]
+tunes = [string.get_pluck(100000) for string in strings]
 track_loc = [0 for _ in strings]
 plucked = [False for i in freqs]
-frame_count_global = 0
+
+def encode(signal):
+    # Convert a 2D numpy array into a byte stream for PyAudio.
+    # Signal has chunk_size rows and channels columns.
+    interleaved = signal.flatten()
+    out_data = interleaved.astype(np.float32).tostring()
+    return out_data
 
 def callback(in_data, frame_count, time_info, flag):
-    global plucked, frame_count_global
+    global plucked, tunes, track_loc
     # print("got callback")
     result = np.zeros(frame_count)
-    frame_count_global = frame_count
     for index, value in enumerate(plucked):
         if value == True:
             curr_loc = track_loc[index]
             result = tunes[index][curr_loc:curr_loc+frame_count]
             track_loc[index] += frame_count
+            
             if track_loc[index] > 40000:
                 plucked[index] = False
                 track_loc[index] = 0
-
+    result = encode(result)
     return (result, pyaudio.paContinue)
 
 p = pyaudio.PyAudio()
