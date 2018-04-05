@@ -15,9 +15,9 @@ for freq, stretch_factor in zip(freqs, stretch_factors):
 # guitar_sound = [sum(string.get_sample() for string in strings) for _ in range(fs * 6)]
 # x = np.array(guitar_sound)
 
-tunes = [string.get_pluck(100000) for string in strings]
+tunes = [string.get_pluck(50000) for string in strings]
 track_loc = [0 for _ in strings]
-plucked = [False for i in freqs]
+# plucked = [False for i in freqs]
 
 def encode(signal):
     # Convert a 2D numpy array into a byte stream for PyAudio.
@@ -27,19 +27,17 @@ def encode(signal):
     return out_data
 
 def callback(in_data, frame_count, time_info, flag):
-    global plucked, tunes, track_loc
+    global tunes, track_loc
     # print("got callback")
-    result = np.zeros(frame_count)
-    for index, value in enumerate(plucked):
-        if value == True:
+    result = np.zeros((len(track_loc),frame_count))
+    for index, value in enumerate(track_loc):
+        if track_loc[index] != 0:
             curr_loc = track_loc[index]
-            result = tunes[index][curr_loc:curr_loc+frame_count]
+            result[index] = tunes[index][curr_loc:curr_loc+frame_count]
             track_loc[index] += frame_count
-            
-            if track_loc[index] > 40000:
-                plucked[index] = False
+            if track_loc[index] > 48000:
                 track_loc[index] = 0
-    result = encode(result)
+    result = encode(np.sum(result,axis=0))
     return (result, pyaudio.paContinue)
 
 p = pyaudio.PyAudio()
@@ -61,13 +59,13 @@ while loop:
     except:
         pass
     if ch == 'q':
-        plucked[0] = True
+        track_loc[0] = 1
     if ch == 'w':
-        plucked[1] = True
+        track_loc[1] = 1
     if ch == 'e':
-        plucked[2] = True
+        track_loc[2] = 1
     if ch == 'r':
-        plucked[3] = True
+        track_loc[3] = 1
     if ch == 'p':
         # Exit and write to file.
         loop = False
