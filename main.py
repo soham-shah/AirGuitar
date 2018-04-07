@@ -2,10 +2,10 @@ import numpy as np
 import pyaudio
 from GuitarString import GuitarString
 import time
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 # initialize the different guitar strings
 fs = 8000 #sampling rate of 8000 hz
-freqs = [100, 125, 150, 175, 200, 225, 250]
+freqs = [50, 500, 1000, 175, 200, 225, 250]
 stretch_factors = [2 * f/98. for f in freqs]
 strings = []
 for freq, stretch_factor in zip(freqs, stretch_factors):
@@ -55,7 +55,7 @@ while loop:
     # time.sleep(0.1) # 0.5
     ch = ""
     try:
-        ch = raw_input("Press q, w, e, r to plunk a stering (p to quit): ")
+        ch = raw_input("Press q, w, e, r to plunk a string (p to quit): ")
     except:
         pass
     if ch == 'q':
