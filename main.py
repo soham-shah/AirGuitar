@@ -2,7 +2,7 @@ import numpy as np
 import pyaudio
 from GuitarString import GuitarString
 import time
-# import matplotlib.pyplot as plt
+
 # initialize the different guitar strings
 fs = 8000 #sampling rate of 8000 hz
 freqs = [50, 500, 1000, 175, 200, 225, 250]

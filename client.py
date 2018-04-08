@@ -22,11 +22,10 @@ GPIO.setup(TRIG,GPIO.OUT)
 GPIO.setup(ECHO,GPIO.IN)
 
 while True:
+    # init defualt message
+    mesg = {"fing1":False,"fing2":False,"fing3":False,"fing4":False,"ultra":0.0}
 
-	# init defualt message
-	mesg = {"fing1":False,"fing2":False,"fing3":False,"fing4":False,"ultra":0.0}
-
-	# test which finger is touching
+    # test which finger is touching
     if (GPIO.input(fing1) == 0):
         mesg["fing1"] = True
     if (GPIO.input(fing2) == 0):
@@ -36,27 +35,27 @@ while True:
     if (GPIO.input(fing4) == 0):
         mesg["fing4"] = True
     
-	GPIO.output(TRIG, False)                 #Set TRIG as LOW
-	time.sleep(.1)                           #Delay of for the read
+    GPIO.output(TRIG, False)                 #Set TRIG as LOW
+    time.sleep(.01)                           #Delay of for the read
 
-	GPIO.output(TRIG, True)                  #Set TRIG as HIGH
-	time.sleep(0.00001)                      #Delay of 0.00001 seconds
-	GPIO.output(TRIG, False)                 #Set TRIG as LOW
+    GPIO.output(TRIG, True)                  #Set TRIG as HIGH
+    time.sleep(0.00001)                      #Delay of 0.00001 seconds
+    GPIO.output(TRIG, False)                 #Set TRIG as LOW
 
-	while GPIO.input(ECHO)==0:               #Check whether the ECHO is LOW
-	pulse_start = time.time()                #Saves the last known time of LOW pulse
+    while GPIO.input(ECHO)==0:               #Check whether the ECHO is LOW
+        pulse_start = time.time()                #Saves the last known time of LOW pulse
 
-	while GPIO.input(ECHO)==1:               #Check whether the ECHO is HIGH
-	pulse_end = time.time()                  #Saves the last known time of HIGH pulse 
+    while GPIO.input(ECHO)==1:               #Check whether the ECHO is HIGH
+        pulse_end = time.time()                  #Saves the last known time of HIGH pulse 
 
-	pulse_duration = pulse_end - pulse_start #Get pulse duration to a variable
+    pulse_duration = pulse_end - pulse_start #Get pulse duration to a variable
 
-	distance = pulse_duration * 17150        #Multiply pulse duration by 17150 to get distance
-	distance = round(distance, 2)            #Round to two decimal points
+    distance = pulse_duration * 17150        #Multiply pulse duration by 17150 to get distance
+    distance = round(distance, 2)            #Round to two decimal points
 
-	if distance > 2 and distance < 100:      #Check whether the distance is within range
-		mesg["ultra"] = distance  			 #Print distance with 0.5 cm calibration
-	
-	#post the final thing out
-	res = requests.post(url, json=mesg)
+    if distance > 2 and distance < 100:      #Check whether the distance is within range
+        mesg["ultra"] = distance             #Print distance with 0.5 cm calibration
+    
+    #post the final thing out
+    res = requests.post(url, json=mesg)
 

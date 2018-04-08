@@ -9,7 +9,7 @@ class GuitarString:
         self.init_wavetable()
         self.current_sample = 0
         self.previous_value = 0
-        
+        self.loc = 0
     def init_wavetable(self):
         """Generates a new wavetable for the string."""
         wavetable_size = self.sampling_freq // int(self.pitch)
@@ -19,7 +19,7 @@ class GuitarString:
         """Returns next sample from string."""
         if self.current_sample >= self.starting_sample:
             current_sample_mod = self.current_sample % self.wavetable.size
-            r = np.random.binomial(1, 1. - 1/self.stretch_factor)
+            r = np.random.binomial(1, 1. - 1./self.stretch_factor)
             if r == 0:
                 self.wavetable[current_sample_mod] =  0.5 * (self.wavetable[current_sample_mod] + self.previous_value)
             sample = self.wavetable[current_sample_mod]
@@ -28,6 +28,7 @@ class GuitarString:
         else:
             self.current_sample += 1
             sample = 0
+        self.loc+=1
         return sample
     def get_pluck(self,size):
         pluck = np.zeros(size)
